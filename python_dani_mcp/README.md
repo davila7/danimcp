@@ -7,7 +7,7 @@ This project contains a Python server as part of the Dani MCP system.
 - **technologies**: This command returns a list of Dani's technologies.
 - **projects**: This command returns a list of Dani's projects.
 - **contact**: This command returns a list of Dani's contact information.
-- 
+
 ## How to use
 Clone the repository and run the server using the command provided below.
 
@@ -79,16 +79,3 @@ Add this to your `.vscode/mcp.json` file:
     }
 }
 ```
-
-## Example questions to use the tools
-- Use the tool about_me and explain who is Daniel 
-- Use the tool projects to know about the projects of Daniel
-- Use the tool technologies and tell me if Daniel knows about python and MCP
-
-The model will use the tools to answer the questions, but first it will ask for confirmation to use the tools.
-
-[add image]
-
-Then the model will read the API response and answer the question.
-
-[add image]
