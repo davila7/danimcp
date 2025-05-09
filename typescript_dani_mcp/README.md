@@ -3,7 +3,6 @@
 This project contains a TypeScript server as part of the Dani MCP system.
 
 ## Features
---
 - **hello**: This command returns a greeting message.
 - **about_me**: This command returns information about the server.
 - **technologies**: This command returns a list of Dani's technologies.
