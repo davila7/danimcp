@@ -79,3 +79,8 @@ Add this to your `.vscode/mcp.json` file:
     }
 }
 ```
+
+## Example questions to use the tools
+- Use the tool about_me and explain who is Daniel 
+- Use the tool projects to know about the projects of Daniel
+- Use the tool technologies and teel me if Daniel knows about python and MCP
