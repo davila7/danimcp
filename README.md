@@ -28,8 +28,8 @@ This MCP Server allows you to interact with this API endpoints:
 
 The model will use the tools to answer the questions, but first it will ask for confirmation to use the tools.
 
-[add image]
+![Screenshot 2025-05-09 at 15 39 52](https://github.com/user-attachments/assets/72aea146-7889-4172-9b15-2cfed780022a)
 
 Then the model will read the API response and answer the question.
 
-[add image]
+![Screenshot 2025-05-09 at 15 40 09](https://github.com/user-attachments/assets/e8f4f3fe-cfec-420b-8999-dd9b08b204ec)
