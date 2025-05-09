@@ -1,6 +1,14 @@
 # DaniMCP Servers
-
 This repository contains the source code for run python and typescript servers for DaniMCP.
+
+# API Endpoints
+This MCP Server allows you to interact with this API endpoints:
+- **Base URL**: `https://danielavila.me`
+- **/api/hello**: Simple endpoint to test the server.
+- **/api/about_me**: Endpoint to get information about me.
+- **/api/technologies**: Endpoint to get a list of technologies I know.
+- **/api/projects**: Endpoint to get a list of my projects.
+- **/api/contact**: Endpoint to get my contact information.
 
 # Servers list
 - [DaniMCP Python Server](https://github.com/davila7/danimcp/tree/main/python_dani_mcp)
