@@ -38,7 +38,7 @@ Then the model will read the API response and answer the question.
 # Python Server
 The Python server is a simple server that returns a greeting message.
 
-## Intall UV
+## Isntall UV
 To install UV, run the following command:
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
