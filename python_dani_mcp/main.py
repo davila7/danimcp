@@ -1,4 +1,4 @@
-# File: server.py
+# File: main.py
 import json
 import urllib.request
 from typing import Dict, Any, List, Optional
@@ -21,6 +21,7 @@ class DaniMCPServer:
         Args:
             name: Name of the MCP server
         """
+        self.name = name  # Add this line to store the name as an attribute
         self.mcp = FastMCP(name)
         self._register_tools()
         
@@ -108,7 +109,9 @@ class DaniMCPServer:
         self.mcp.run(transport=transport)
 
 
+# Create a server instance at the module level with a standard name
+server = DaniMCPServer()
+
 # Main entry point
 if __name__ == "__main__":
-    server = DaniMCPServer()
     server.run()
