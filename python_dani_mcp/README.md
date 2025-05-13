@@ -24,7 +24,7 @@ Add this to your `.codegpt/mcp_config.json` file:
 {
   "mcpServers": {
     "DaniMCP Python Server": {
-      "command": "/Users/danipower/.local/bin/uv",
+      "command": "/path/to/uv/.local/bin/uv",
       "args": [
         "run",
         "--with",
@@ -44,7 +44,7 @@ Add this to your `claude_desktop_config.json` file:
 {
   "mcpServers": {
     "DaniMCP Python Server": {
-      "command": "/Users/danipower/.local/bin/uv",
+      "command": "/path/to/uv/.local/bin/uv",
       "args": [
         "run",
         "--with",
@@ -65,7 +65,7 @@ Add this to your `.vscode/mcp.json` file:
   "mcp": {
     "servers": {
       "DaniMCP Python Server": {
-        "command": "/Users/danipower/.local/bin/uv",
+        "command": "/path/to/uv/.local/bin/uv",
             "args": [
                     "run",
                     "--with",
