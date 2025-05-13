@@ -33,3 +33,35 @@ The model will use the tools to answer the questions, but first it will ask for 
 Then the model will read the API response and answer the question.
 
 ![Screenshot 2025-05-09 at 15 40 09](https://github.com/user-attachments/assets/e8f4f3fe-cfec-420b-8999-dd9b08b204ec)
+
+
+# Python Server
+The Python server is a simple server that returns a greeting message.
+
+## Intall UV
+To install UV, run the following command:
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+## Installation
+Go to the python_dani_mcp folder and run the following command:
+```bash
+cd python_dani_mcp
+```
+
+Then add MCP to your project dependencies:
+```bash
+uv add "mcp[cli]"
+```
+
+To install the Python server, run the following command:
+```bash
+uv run mcp install main.py
+```
+
+## Add the server to the MCP
+To add the server to the MCP, run the following command:
+```bash
+uv run mcp add main.py
+```
