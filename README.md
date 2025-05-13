@@ -50,18 +50,26 @@ Go to the python_dani_mcp folder and run the following command:
 cd python_dani_mcp
 ```
 
-Then add MCP to your project dependencies:
-```bash
-uv add "mcp[cli]"
-```
-
 To install the Python server, run the following command:
 ```bash
-uv run mcp install main.py
+uv run mcp install server.py
 ```
 
-## Add the server to the MCP
-To add the server to the MCP, run the following command:
-```bash
-uv run mcp add main.py
+or Add this to your `.codegpt/mcp_config.json` for CodeGPT or `/path/to/Claude/claude_desktop_config.json` for Claude Desktop:
+```json
+{
+  "mcpServers": {
+    "DaniMCP Python Server": {
+      "command": "/path/to/uv/.local/bin/uv",
+      "args": [
+        "run",
+        "--with",
+        "mcp[cli]",
+        "mcp",
+        "run",
+        "/path/to/projects/danimcp/python_dani_mcp/server.py"
+      ]
+    }
+  }
+}
 ```
