@@ -9,7 +9,7 @@ class DaniMCPTools:
     """Tools implementation for Daniel Avila's MCP server"""
 
     def __init__(self):
-        self._base_url = "https://danielavila.me/api"
+        self._base_url = "https://www.danielavila.me/api"
 
     def _fetch_api_data(self, endpoint: str) -> Dict[str, Any]:
         """Helper method to fetch data from the API (GET requests)"""

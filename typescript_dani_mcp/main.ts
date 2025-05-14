@@ -44,7 +44,7 @@ server.resource(
 async function startServer() {
     const transport = new StdioServerTransport();
     await server.connect(transport);
-  }
+}
   
-  // Call the async function
-  startServer();
+// Call the async function
+startServer();
