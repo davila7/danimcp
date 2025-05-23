@@ -10,7 +10,7 @@ const server = new McpServer({
 
 
 // Add an addition tool
-server.tool(
+const serverTool = server.tool(
     "about_me", // title
     "description about me ", // description
     {
@@ -25,6 +25,9 @@ server.tool(
         }
     }
 );
+
+
+
 
 // Add a dynamic greeting resource
 server.resource(

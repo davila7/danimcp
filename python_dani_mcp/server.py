@@ -1,10 +1,5 @@
 # File: server.py
-import json
-import urllib.request
-from typing import Dict, Any, List
-
 from mcp.server.fastmcp import FastMCP
-from mcp.types import TextContent
 
 import tools
 import prompts
@@ -42,7 +37,7 @@ class DaniMCPServer:
         self.mcp.run(transport=transport)
 
 # Create a server instance at the module level
-server = DaniMCPServer()
+server = DaniMCPServer().mcp
 
 # Main entry point
 if __name__ == "__main__":
