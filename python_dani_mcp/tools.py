@@ -42,14 +42,12 @@ class DaniMCPTools:
 
     def _format_response(self, data: Dict[str, Any]) -> Dict[str, List[TextContent]]:
         """Formats data for MCP response"""
-        return {
-            "content": [
-                TextContent(
-                    type="text",
-                    text=json.dumps(data, indent=4)
-                )
-            ]
-        }
+        return [
+            TextContent(
+                type="text",
+                text=json.dumps(data, indent=4)
+            )
+        ]
 
     def hello(self) -> Dict[str, List[TextContent]]:
         """Gets a greeting from the API"""
