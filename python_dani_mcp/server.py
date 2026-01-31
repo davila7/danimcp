@@ -29,15 +29,15 @@ class DaniMCPServer:
 
     def _register_tools(self) -> None:
         """Registers all available tools in the MCP server"""
-        self.mcp.tool(output_schema=False)(self.tools.hello)
-        self.mcp.tool(output_schema=False, meta={"ui": {"resourceUri": RESOURCE_URIS["about_me"]}})(self.tools.about_me)
-        self.mcp.tool(output_schema=False, meta={"ui": {"resourceUri": RESOURCE_URIS["technologies"]}})(self.tools.technologies)
-        self.mcp.tool(output_schema=False, meta={"ui": {"resourceUri": RESOURCE_URIS["projects"]}})(self.tools.projects)
-        self.mcp.tool(output_schema=False)(self.tools.contact)
-        self.mcp.tool(output_schema=False)(self.tools.send_contact_message)
-        self.mcp.tool(output_schema=False)(self.tools.talks)
-        self.mcp.tool(output_schema=False, meta={"ui": {"resourceUri": RESOURCE_URIS["skills"]}})(self.tools.skills)
-        self.mcp.tool(output_schema=False)(self.tools.check_skill)
+        self.mcp.tool(output_schema=None)(self.tools.hello)
+        self.mcp.tool(output_schema=None, meta={"ui": {"resourceUri": RESOURCE_URIS["about_me"]}})(self.tools.about_me)
+        self.mcp.tool(output_schema=None, meta={"ui": {"resourceUri": RESOURCE_URIS["technologies"]}})(self.tools.technologies)
+        self.mcp.tool(output_schema=None, meta={"ui": {"resourceUri": RESOURCE_URIS["projects"]}})(self.tools.projects)
+        self.mcp.tool(output_schema=None)(self.tools.contact)
+        self.mcp.tool(output_schema=None)(self.tools.send_contact_message)
+        self.mcp.tool(output_schema=None)(self.tools.talks)
+        self.mcp.tool(output_schema=None, meta={"ui": {"resourceUri": RESOURCE_URIS["skills"]}})(self.tools.skills)
+        self.mcp.tool(output_schema=None)(self.tools.check_skill)
 
     def _register_prompts(self) -> None:
         """Registers all available prompts in the MCP server"""
