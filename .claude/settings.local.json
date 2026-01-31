@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:gofastmcp.com)",
+      "Bash(uv run python:*)"
+    ]
+  }
+}

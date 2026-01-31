@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects - Daniel Avila</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a; color: #e2e8f0; padding: 24px;
+      min-height: 100vh;
+    }
+    h1 { font-size: 1.5rem; text-align: center; margin-bottom: 8px; color: #f8fafc; }
+    .subtitle { font-size: 0.875rem; color: #94a3b8; text-align: center; margin-bottom: 24px; }
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px; max-width: 900px; margin: 0 auto;
+    }
+    .project-card {
+      background: #1e293b; border: 1px solid #334155; border-radius: 16px;
+      padding: 24px; transition: border-color 0.2s, transform 0.2s;
+      display: flex; flex-direction: column;
+    }
+    .project-card:hover { border-color: #818cf8; transform: translateY(-2px); }
+    .project-number {
+      font-size: 0.7rem; color: #64748b; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;
+    }
+    .project-title { font-size: 1.125rem; font-weight: 600; color: #f8fafc; margin-bottom: 8px; }
+    .project-desc {
+      font-size: 0.825rem; color: #94a3b8; line-height: 1.5;
+      flex: 1; margin-bottom: 16px;
+    }
+    .project-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: #818cf8; text-decoration: none; font-size: 0.8rem; font-weight: 500;
+    }
+    .project-link:hover { color: #a5b4fc; }
+    .project-link svg { width: 14px; height: 14px; }
+    .loading {
+      display: flex; align-items: center; justify-content: center;
+      height: 300px; color: #64748b; font-size: 0.875rem;
+    }
+    .loading::after {
+      content: ''; width: 20px; height: 20px; margin-left: 10px;
+      border: 2px solid #334155; border-top-color: #818cf8;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <h1>Projects</h1>
+  <p class="subtitle">Daniel Avila's featured work</p>
+  <div id="loading" class="loading">Loading projects</div>
+  <div id="grid" class="grid"></div>
+
+  <script type="module">
+    function renderProjects(projects) {
+      document.getElementById('loading').style.display = 'none';
+      const grid = document.getElementById('grid');
+      grid.innerHTML = projects.map((p, i) => `
+        <div class="project-card">
+          <div class="project-number">Project ${String(i + 1).padStart(2, '0')}</div>
+          <div class="project-title">${p.title}</div>
+          <div class="project-desc">${p.des}</div>
+          ${p.link ? `<a class="project-link" href="${p.link}" target="_blank" rel="noopener">
+            Visit project
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 17L17 7M17 7H7M17 7V17"/>
+            </svg>
+          </a>` : ''}
+        </div>
+      `).join('');
+    }
+
+    async function init() {
+      try {
+        const { App } = await import("https://esm.sh/@modelcontextprotocol/ext-apps@1.0.1");
+        const app = new App({ name: "Projects", version: "1.0.0" });
+        app.ontoolresult = (result) => {
+          const text = result.content?.find(c => c.type === "text")?.text;
+          if (text) renderProjects(JSON.parse(text));
+        };
+        app.connect();
+      } catch {
+        const res = await fetch("https://www.danielavila.me/api/projects");
+        renderProjects(await res.json());
+      }
+    }
+    init();
+  </script>
+</body>
+</html>

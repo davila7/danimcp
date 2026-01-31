@@ -1,9 +1,7 @@
 # File: tools.py
 import json
-from typing import Dict, Any, List
-from mcp.types import TextContent
+from typing import Dict, Any
 import urllib.request
-import urllib.parse
 
 class DaniMCPTools:
     """Tools implementation for Daniel Avila's MCP server"""
@@ -29,7 +27,7 @@ class DaniMCPTools:
             req = urllib.request.Request(
                 f"{self._base_url}/{endpoint}",
                 data=data_encoded,
-                headers={'Content-Type': 'application/json'},\
+                headers={'Content-Type': 'application/json'},
                 method='POST'
             )
             with urllib.request.urlopen(req) as response:
@@ -40,56 +38,47 @@ class DaniMCPTools:
         except Exception as e:
             raise Exception(f"Error posting data to API: {str(e)}")
 
-    def _format_response(self, data: Dict[str, Any]) -> Dict[str, List[TextContent]]:
-        """Formats data for MCP response"""
-        return [
-            TextContent(
-                type="text",
-                text=json.dumps(data, indent=4)
-            )
-        ]
-
-    def hello(self) -> Dict[str, List[TextContent]]:
+    def hello(self) -> str:
         """Gets a greeting from the API"""
         data = self._fetch_api_data("hello")
-        return self._format_response(data)
+        return json.dumps(data, indent=4)
 
-    def about_me(self) -> Dict[str, List[TextContent]]:
+    def about_me(self) -> str:
         """Gets information about Daniel Avila"""
         data = self._fetch_api_data("about_me")
-        return self._format_response(data)
+        return json.dumps(data, indent=4)
 
-    def technologies(self) -> Dict[str, List[TextContent]]:
+    def technologies(self) -> str:
         """Gets information about technologies Daniel Avila uses"""
         data = self._fetch_api_data("technologies")
-        return self._format_response(data)
+        return json.dumps(data, indent=4)
 
-    def projects(self) -> Dict[str, List[TextContent]]:
+    def projects(self) -> str:
         """Gets information about Daniel Avila's projects"""
         data = self._fetch_api_data("projects")
-        return self._format_response(data)
+        return json.dumps(data, indent=4)
 
-    def contact(self) -> Dict[str, List[TextContent]]:
+    def contact(self) -> str:
         """Gets Daniel Avila's contact information"""
         data = self._fetch_api_data("contact")
-        return self._format_response(data)
+        return json.dumps(data, indent=4)
 
-    def send_contact_message(self, message: str) -> Dict[str, List[TextContent]]:
+    def send_contact_message(self, message: str) -> str:
         """Sends a message through the contact form"""
         data = self._post_api_data("contact", {"message": message})
-        return self._format_response(data)
+        return json.dumps(data, indent=4)
 
-    def talks(self) -> Dict[str, List[TextContent]]:
+    def talks(self) -> str:
         """Retrieves information about talks given and community involvement"""
         data = self._fetch_api_data("talks")
-        return self._format_response(data)
+        return json.dumps(data, indent=4)
 
-    def skills(self) -> Dict[str, List[TextContent]]:
+    def skills(self) -> str:
         """Retrieves detailed information about different skill sets"""
         data = self._fetch_api_data("skills")
-        return self._format_response(data)
+        return json.dumps(data, indent=4)
 
-    def check_skill(self, skill_name: str) -> Dict[str, List[TextContent]]:
+    def check_skill(self, skill_name: str) -> str:
         """Checks if Daniel Avila has a specific skill"""
         data = self._fetch_api_data(f"skills/{skill_name}")
-        return self._format_response(data)
+        return json.dumps(data, indent=4)

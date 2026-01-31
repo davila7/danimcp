@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skills Overview - Daniel Avila</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a; color: #e2e8f0; padding: 24px;
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 8px; color: #f8fafc; }
+    .subtitle { font-size: 0.875rem; color: #94a3b8; margin-bottom: 24px; }
+    .chart-container {
+      width: 100%; max-width: 520px; aspect-ratio: 1;
+      background: #1e293b; border-radius: 16px; padding: 24px;
+      border: 1px solid #334155;
+    }
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px;
+      justify-content: center; max-width: 520px;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 6px;
+      background: #1e293b; border: 1px solid #334155;
+      border-radius: 8px; padding: 6px 12px; font-size: 0.75rem;
+    }
+    .legend-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    .loading {
+      display: flex; align-items: center; justify-content: center;
+      height: 300px; color: #64748b; font-size: 0.875rem;
+    }
+    .loading::after {
+      content: ''; width: 20px; height: 20px; margin-left: 10px;
+      border: 2px solid #334155; border-top-color: #818cf8;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <h1>Skills Overview</h1>
+  <p class="subtitle">Daniel Avila's technical expertise by category</p>
+  <div class="chart-container">
+    <div id="loading" class="loading">Loading skills data</div>
+    <canvas id="skillsChart" style="display:none"></canvas>
+  </div>
+  <div id="legend" class="legend"></div>
+
+  <script type="module">
+    const COLORS = [
+      { bg: 'rgba(129,140,248,0.25)', border: '#818cf8' },
+      { bg: 'rgba(52,211,153,0.25)', border: '#34d399' },
+      { bg: 'rgba(251,191,36,0.25)',  border: '#fbbf24' },
+      { bg: 'rgba(248,113,113,0.25)', border: '#f87171' },
+      { bg: 'rgba(56,189,248,0.25)',  border: '#38bdf8' },
+      { bg: 'rgba(192,132,252,0.25)', border: '#c084fc' },
+    ];
+
+    function countItems(obj) {
+      if (Array.isArray(obj)) return obj.length;
+      if (typeof obj === 'object' && obj !== null) {
+        return Object.values(obj).reduce((sum, v) => sum + countItems(v), 0);
+      }
+      return 1;
+    }
+
+    function formatLabel(key) {
+      return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function renderChart(data) {
+      document.getElementById('loading').style.display = 'none';
+      const canvas = document.getElementById('skillsChart');
+      canvas.style.display = 'block';
+
+      const categories = Object.keys(data);
+      const labels = categories.map(formatLabel);
+      const values = categories.map(k => countItems(data[k]));
+
+      new Chart(canvas, {
+        type: 'radar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Number of Skills',
+            data: values,
+            backgroundColor: 'rgba(129,140,248,0.2)',
+            borderColor: '#818cf8',
+            borderWidth: 2,
+            pointBackgroundColor: '#818cf8',
+            pointBorderColor: '#1e293b',
+            pointBorderWidth: 2,
+            pointRadius: 5,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            r: {
+              beginAtZero: true,
+              grid: { color: '#334155' },
+              angleLines: { color: '#334155' },
+              pointLabels: { color: '#cbd5e1', font: { size: 11 } },
+              ticks: { color: '#64748b', backdropColor: 'transparent', stepSize: 2 }
+            }
+          }
+        }
+      });
+
+      const legendEl = document.getElementById('legend');
+      categories.forEach((key, i) => {
+        const color = COLORS[i % COLORS.length];
+        legendEl.innerHTML += `<div class="legend-item">
+          <span class="legend-dot" style="background:${color.border}"></span>
+          ${formatLabel(key)}: <strong>${values[i]}</strong>
+        </div>`;
+      });
+    }
+
+    // Try ext-apps connection, fallback to direct API
+    async function init() {
+      try {
+        const { App } = await import("https://esm.sh/@modelcontextprotocol/ext-apps@1.0.1");
+        const app = new App({ name: "Skills Chart", version: "1.0.0" });
+        app.ontoolresult = (result) => {
+          const text = result.content?.find(c => c.type === "text")?.text;
+          if (text) renderChart(JSON.parse(text));
+        };
+        app.connect();
+      } catch {
+        const res = await fetch("https://www.danielavila.me/api/skills");
+        renderChart(await res.json());
+      }
+    }
+    init();
+  </script>
+</body>
+</html>
