@@ -12,7 +12,11 @@ class DaniMCPTools:
     def _fetch_api_data(self, endpoint: str) -> Dict[str, Any]:
         """Helper method to fetch data from the API (GET requests)"""
         try:
-            response = urllib.request.urlopen(f"{self._base_url}/{endpoint}")
+            req = urllib.request.Request(
+                f"{self._base_url}/{endpoint}",
+                headers={"User-Agent": "DaniMCP/1.0", "Accept": "application/json"},
+            )
+            response = urllib.request.urlopen(req)
             if response.getcode() == 200:
                 return json.loads(response.read())
             else:
