@@ -9,10 +9,10 @@ VIEWS_DIR = Path(__file__).parent / "views"
 
 # Resource URIs for ext-apps UI views
 RESOURCE_URIS = {
-    "skills": "app://danimcp/skills-chart",
-    "technologies": "app://danimcp/tech-chart",
-    "about_me": "app://danimcp/profile",
-    "projects": "app://danimcp/projects",
+    "skills": "ui://danimcp/skills-chart",
+    "technologies": "ui://danimcp/tech-chart",
+    "about_me": "ui://danimcp/profile",
+    "projects": "ui://danimcp/projects",
 }
 
 class DaniMCPServer:
