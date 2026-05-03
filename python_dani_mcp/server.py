@@ -1,6 +1,7 @@
 # File: server.py
 from pathlib import Path
 from fastmcp import FastMCP
+from fastmcp.resources import ResourceContent, ResourceResult
 
 import tools
 import prompts
@@ -13,6 +14,15 @@ RESOURCE_URIS = {
     "technologies": "ui://danimcp/tech-chart",
     "about_me": "ui://danimcp/profile",
     "projects": "ui://danimcp/projects",
+}
+
+UI_CSP = {
+    "ui": {
+        "csp": {
+            "connectDomains": ["https://www.danielavila.me", "https://esm.sh"],
+            "resourceDomains": ["https://esm.sh", "https://cdn.jsdelivr.net"],
+        }
+    }
 }
 
 class DaniMCPServer:
@@ -46,23 +56,22 @@ class DaniMCPServer:
 
     def _register_resources(self) -> None:
         """Registers HTML UI resources for ext-apps visualization"""
-        mime = "text/html; charset=utf-8"
 
-        @self.mcp.resource(RESOURCE_URIS["skills"], mime_type=mime, title="Skills Chart", description="Radar chart of Daniel's skills by category")
-        def skills_chart() -> str:
-            return (VIEWS_DIR / "skills_chart.html").read_text()
+        @self.mcp.resource(RESOURCE_URIS["skills"], title="Skills Chart", description="Radar chart of Daniel's skills by category", meta=UI_CSP)
+        def skills_chart() -> ResourceContent:
+            return ResourceResult([ResourceContent((VIEWS_DIR / "skills_chart.html").read_text(), mime_type="text/html;profile=mcp-app")])
 
-        @self.mcp.resource(RESOURCE_URIS["technologies"], mime_type=mime, title="Technologies Chart", description="Bar chart of Daniel's technologies by proficiency")
-        def tech_chart() -> str:
-            return (VIEWS_DIR / "tech_chart.html").read_text()
+        @self.mcp.resource(RESOURCE_URIS["technologies"], title="Technologies Chart", description="Bar chart of Daniel's technologies by proficiency", meta=UI_CSP)
+        def tech_chart() -> ResourceContent:
+            return ResourceResult([ResourceContent((VIEWS_DIR / "tech_chart.html").read_text(), mime_type="text/html;profile=mcp-app")])
 
-        @self.mcp.resource(RESOURCE_URIS["about_me"], mime_type=mime, title="Profile Card", description="Daniel Avila's profile card")
-        def profile_card() -> str:
-            return (VIEWS_DIR / "profile.html").read_text()
+        @self.mcp.resource(RESOURCE_URIS["about_me"], title="Profile Card", description="Daniel Avila's profile card", meta=UI_CSP)
+        def profile_card() -> ResourceContent:
+            return ResourceResult([ResourceContent((VIEWS_DIR / "profile.html").read_text(), mime_type="text/html;profile=mcp-app")])
 
-        @self.mcp.resource(RESOURCE_URIS["projects"], mime_type=mime, title="Projects Gallery", description="Daniel Avila's featured projects")
-        def projects_gallery() -> str:
-            return (VIEWS_DIR / "projects.html").read_text()
+        @self.mcp.resource(RESOURCE_URIS["projects"], title="Projects Gallery", description="Daniel Avila's featured projects", meta=UI_CSP)
+        def projects_gallery() -> ResourceContent:
+            return ResourceResult([ResourceContent((VIEWS_DIR / "projects.html").read_text(), mime_type="text/html;profile=mcp-app")])
 
     def run(self, transport: str = "stdio") -> None:
         """Runs the MCP server with the specified transport"""

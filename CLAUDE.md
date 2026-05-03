@@ -55,16 +55,52 @@ The Python server exports two module-level objects:
 - `server` — FastMCP instance for stdio transport (`uv run python server.py`)
 - `app` — ASGI app (Starlette) for Streamable HTTP transport, created with `stateless_http=True` for serverless compatibility. The MCP endpoint is mounted at `/mcp`.
 
-### ext-apps UI Views (Python only)
+### MCP Apps UI Views (Python only)
 
-The Python server registers 4 HTML resources following the [MCP ext-apps](https://modelcontextprotocol.github.io/ext-apps/) spec. Tools link to UI views via `_meta.ui.resourceUri`:
+The Python server registers 4 HTML resources following the [MCP Apps spec (2026-01-26)](https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx). Tools link to UI views via `_meta.ui.resourceUri`:
 
-- `app://danimcp/skills-chart` — Radar chart of skills by category (Chart.js)
-- `app://danimcp/tech-chart` — Horizontal bar chart of technologies by proficiency
-- `app://danimcp/profile` — Profile card with personal info
-- `app://danimcp/projects` — Card grid of featured projects
+- `ui://danimcp/skills-chart` — Radar chart of skills by category (Chart.js)
+- `ui://danimcp/tech-chart` — Horizontal bar chart of technologies by proficiency
+- `ui://danimcp/profile` — Profile card with personal info
+- `ui://danimcp/projects` — Card grid of featured projects
 
 Views are self-contained HTML files in `python_dani_mcp/views/` that use Chart.js CDN and the `@modelcontextprotocol/ext-apps` App class for host communication.
+
+#### Critical implementation rules (hard-won fixes)
+
+**1. URI scheme must be `ui://`** — not `app://`. Hosts (Claude.ai, Inspector) only recognize `ui://`.
+
+**2. Resources must return `ResourceResult([ResourceContent(...)])`, not a plain string.**
+FastMCP defaults string returns to `mimeType: "text/plain"`, which hosts reject. The correct pattern:
+```python
+from fastmcp.resources import ResourceContent, ResourceResult
+
+@mcp.resource(uri, ...)
+def my_view() -> ResourceResult:
+    return ResourceResult([ResourceContent(Path("view.html").read_text(), mime_type="text/html;profile=mcp-app")])
+```
+
+**3. `mimeType` must be exactly `"text/html;profile=mcp-app"`** — MCP Inspector (and Claude.ai) do a strict equality check against this string. `"text/html"` alone is rejected.
+
+**4. CSP must be declared on the resource via `meta=`** — the sandboxed iframe blocks all external origins by default. Declare allowed origins with `connectDomains` (fetch/XHR) and `resourceDomains` (scripts/CSS):
+```python
+UI_CSP = {
+    "ui": {
+        "csp": {
+            "connectDomains": ["https://www.danielavila.me", "https://esm.sh"],
+            "resourceDomains": ["https://esm.sh", "https://cdn.jsdelivr.net"],
+        }
+    }
+}
+
+@mcp.resource(uri, meta=UI_CSP, ...)
+def my_view() -> ResourceResult: ...
+```
+
+**5. API requests need explicit `User-Agent` header** — the `danielavila.me` API is behind Cloudflare, which blocks Python's `urllib` default (no User-Agent) with 403. Always use:
+```python
+req = urllib.request.Request(url, headers={"User-Agent": "DaniMCP/1.0", "Accept": "application/json"})
+```
 
 ## Vercel Deployment
 
@@ -81,11 +117,18 @@ The Python server can be deployed to Vercel as a remote MCP server with Streamab
 cd python_dani_mcp && vercel link --project danimcp --yes && vercel deploy
 ```
 
-**Verify with MCP Inspector:**
+**Local iteration loop (test before deploying):**
 ```bash
+# Terminal 1 — start local server
+cd python_dani_mcp && uv run uvicorn server:app --host 0.0.0.0 --port 8000
+
+# Terminal 2 — start MCP Inspector
 npx @modelcontextprotocol/inspector
-# → Select Streamable HTTP → http://localhost:8000/mcp (local) or https://<app>.vercel.app/mcp (remote)
+# → Transport: Streamable HTTP → URL: http://localhost:8000/mcp → Connect
+# → Apps tab → click a tool → UI should render in the right panel
 ```
+
+Only push to git (triggering Vercel deploy) once the UI renders correctly in the Inspector locally.
 
 ## Claude Desktop Configuration
 
