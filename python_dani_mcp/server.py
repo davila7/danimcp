@@ -1,88 +1,69 @@
-# File: server.py
-from pathlib import Path
+"""DaniMCP — MCP server exposing Daniel Avila's professional information.
+
+Entry points:
+- ``mcp`` / ``server``: FastMCP instance (``fastmcp run server.py:mcp``)
+- ``app``: ASGI app for Streamable HTTP at ``/mcp`` (uvicorn / Vercel)
+- ``python server.py [--http]``: stdio by default, HTTP with ``--http``
+"""
+
+from __future__ import annotations
+
+import os
+import sys
+
 from fastmcp import FastMCP
-from fastmcp.resources import ResourceContent, ResourceResult
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
-import tools
-import prompts
+from api import DaniAPI
+from prompts import register_prompts
+from tools import register_tools
+from views import register_views
 
-VIEWS_DIR = Path(__file__).parent / "views"
+SERVER_NAME = "DaniMCP"
+SERVER_VERSION = "2.0.0"
 
-# Resource URIs for ext-apps UI views
-RESOURCE_URIS = {
-    "skills": "ui://danimcp/skills-chart",
-    "technologies": "ui://danimcp/tech-chart",
-    "about_me": "ui://danimcp/profile",
-    "projects": "ui://danimcp/projects",
-}
+INSTRUCTIONS = """\
+Tools for answering questions about Daniel Avila (AI Software Engineer, creator of Claude Code Templates).
+Use `about_me`, `skills`, `technologies`, `projects` and `talks` for facts.
+Prefer `check_skill` for yes/no questions about a specific skill.
+`send_contact_message` delivers a real message to Daniel: only use it when the user explicitly asks,
+after confirming the text with them.
+"""
 
-UI_CSP = {
-    "ui": {
-        "csp": {
-            "connectDomains": ["https://www.danielavila.me", "https://esm.sh"],
-            "resourceDomains": ["https://esm.sh", "https://cdn.jsdelivr.net"],
-        }
-    }
-}
 
-class DaniMCPServer:
-    """Main class for Daniel Avila's MCP server"""
+def create_server(api: DaniAPI | None = None) -> FastMCP:
+    mcp = FastMCP(
+        SERVER_NAME,
+        instructions=INSTRUCTIONS,
+        version=SERVER_VERSION,
+        website_url="https://www.danielavila.me",
+        # Tool errors are raised as ToolError with safe messages; hide anything else.
+        mask_error_details=True,
+    )
+    api = api or DaniAPI()
+    register_tools(mcp, api)
+    register_prompts(mcp)
+    register_views(mcp)
 
-    def __init__(self, name: str = "DaniMCP Python Server", stateless_http: bool = False):
-        self.name = name
-        self.mcp = FastMCP(name, stateless_http=stateless_http)
-        self.tools = tools.DaniMCPTools()
-        self.prompts = prompts.DaniMCPPrompts()
-        self._register_tools()
-        self._register_prompts()
-        self._register_resources()
+    @mcp.custom_route("/health", methods=["GET"])
+    async def health(_: Request) -> JSONResponse:
+        return JSONResponse({"status": "ok", "name": SERVER_NAME, "version": SERVER_VERSION})
 
-    def _register_tools(self) -> None:
-        """Registers all available tools in the MCP server"""
-        self.mcp.tool(output_schema=None)(self.tools.hello)
-        self.mcp.tool(output_schema=None, meta={"ui": {"resourceUri": RESOURCE_URIS["about_me"]}})(self.tools.about_me)
-        self.mcp.tool(output_schema=None, meta={"ui": {"resourceUri": RESOURCE_URIS["technologies"]}})(self.tools.technologies)
-        self.mcp.tool(output_schema=None, meta={"ui": {"resourceUri": RESOURCE_URIS["projects"]}})(self.tools.projects)
-        self.mcp.tool(output_schema=None)(self.tools.contact)
-        self.mcp.tool(output_schema=None)(self.tools.send_contact_message)
-        self.mcp.tool(output_schema=None)(self.tools.talks)
-        self.mcp.tool(output_schema=None, meta={"ui": {"resourceUri": RESOURCE_URIS["skills"]}})(self.tools.skills)
-        self.mcp.tool(output_schema=None)(self.tools.check_skill)
+    return mcp
 
-    def _register_prompts(self) -> None:
-        """Registers all available prompts in the MCP server"""
-        self.mcp.prompt()(self.prompts.about_me_prompt)
-        self.mcp.prompt()(self.prompts.tech_prompt)
 
-    def _register_resources(self) -> None:
-        """Registers HTML UI resources for ext-apps visualization"""
+mcp = create_server()
+server = mcp  # backwards-compatible name for `fastmcp run server.py:server`
 
-        @self.mcp.resource(RESOURCE_URIS["skills"], title="Skills Chart", description="Radar chart of Daniel's skills by category", meta=UI_CSP)
-        def skills_chart() -> ResourceContent:
-            return ResourceResult([ResourceContent((VIEWS_DIR / "skills_chart.html").read_text(), mime_type="text/html;profile=mcp-app")])
+# Stateless Streamable HTTP: no session affinity needed, so it works on serverless (Vercel).
+app = mcp.http_app(path="/mcp", stateless_http=True)
 
-        @self.mcp.resource(RESOURCE_URIS["technologies"], title="Technologies Chart", description="Bar chart of Daniel's technologies by proficiency", meta=UI_CSP)
-        def tech_chart() -> ResourceContent:
-            return ResourceResult([ResourceContent((VIEWS_DIR / "tech_chart.html").read_text(), mime_type="text/html;profile=mcp-app")])
 
-        @self.mcp.resource(RESOURCE_URIS["about_me"], title="Profile Card", description="Daniel Avila's profile card", meta=UI_CSP)
-        def profile_card() -> ResourceContent:
-            return ResourceResult([ResourceContent((VIEWS_DIR / "profile.html").read_text(), mime_type="text/html;profile=mcp-app")])
-
-        @self.mcp.resource(RESOURCE_URIS["projects"], title="Projects Gallery", description="Daniel Avila's featured projects", meta=UI_CSP)
-        def projects_gallery() -> ResourceContent:
-            return ResourceResult([ResourceContent((VIEWS_DIR / "projects.html").read_text(), mime_type="text/html;profile=mcp-app")])
-
-    def run(self, transport: str = "stdio") -> None:
-        """Runs the MCP server with the specified transport"""
-        self.mcp.run(transport=transport)
-
-# Create a server instance at the module level
-server = DaniMCPServer().mcp
-
-# ASGI app for Vercel deployment (Streamable HTTP)
-app = DaniMCPServer(stateless_http=True).mcp.http_app(path="/mcp")
-
-# Main entry point
 if __name__ == "__main__":
-    server.run()
+    if "--http" in sys.argv:
+        mcp.run(
+            transport="http", host="0.0.0.0", port=int(os.environ.get("PORT", "8000")), path="/mcp", stateless_http=True
+        )
+    else:
+        mcp.run()
