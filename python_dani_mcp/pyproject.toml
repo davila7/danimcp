@@ -1,9 +1,32 @@
 [project]
-name = "python-dani-mcp"
-version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
+name = "danimcp"
+version = "2.0.0"
+description = "MCP server exposing Daniel Avila's professional information, with MCP Apps UI views"
 requires-python = ">=3.12"
 dependencies = [
-    "fastmcp>=3.0.0b1",
+    "fastmcp>=4.1.4,<5",
+    "httpx2>=2.5.0",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=1.0",
+    "ruff>=0.8",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]

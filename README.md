@@ -1,80 +1,82 @@
-# DaniMCP Servers
-This repository contains the source code for run python and typescript servers for DaniMCP.
+# DaniMCP
 
-# Servers list
-- [DaniMCP Python Server](https://github.com/davila7/danimcp/tree/main/python_dani_mcp)
-- [DaniMCP Typescript Server](https://github.com/davila7/danimcp/tree/main/typescript_dani_mcp)
+MCP server that exposes Daniel Avila's professional information (profile, skills, technologies, projects, talks, contact) through tools, prompts and [MCP Apps](https://github.com/modelcontextprotocol/ext-apps) UI views.
 
-# Tool list 
-- **hello**: This command returns a greeting message.
-- **about_me**: This command returns information about the server.
-- **skills**: This command returns a list of Dani's skills.
-- **check_skill**: This command checks if Dani has a specific skill.
-- **technologies**: This command returns a list of Dani's technologies.
-- **projects**: This command returns a list of Dani's projects.
-- **talks**: This command returns a list of Dani's talks.
-- **contact**: This command returns a list of Dani's contact information.
-- **send_contact_message**: This command sends a message to Dani.
+Built with [FastMCP 4](https://gofastmcp.com). Data comes from `https://www.danielavila.me/api`.
 
-# Prompts list
-- **about_me_prompt**: This prompt is used to get information about Dani.
-- **tech_prompt**: This prompt is used to get information about Dani's technologies.        
+## Tools
 
-## Example questions to use the tools
-- Use the tool about_me and explain who is Daniel 
-- Use the tool projects to know about the projects that Daniel has done
-- Send a message to Daniel using the tool send_contact_message
-- Use the tool check_skill and tell me if Daniel knows about python
-- Use the tool technologies and tell me if Daniel knows about python and MCP
+| Tool | Description | UI view |
+|------|-------------|---------|
+| `hello` | Short greeting | — |
+| `about_me` | Profile: name, occupation, location, education | Profile card |
+| `skills` | Skills grouped by category | Skills per category |
+| `check_skill` | Does Daniel have skill X, and where does it appear | — |
+| `technologies` | Technologies and proficiency level | Technologies by level |
+| `projects` | Featured projects | Projects gallery |
+| `talks` | Talks and community involvement | — |
+| `contact` | Contact information | — |
+| `send_contact_message` | Sends a message through the website contact form | — |
 
-# How this works
-The model will use the tools to answer the questions, but first it will ask for confirmation to use the tools.
+All tools return `structuredContent` (plus the same JSON as text). Read tools are annotated `readOnlyHint`.
 
-![Screenshot 2025-05-09 at 15 39 52](https://github.com/user-attachments/assets/72aea146-7889-4172-9b15-2cfed780022a)
+## Prompts
 
-Then the model will read the API response and answer the question.
+- `about_me_prompt` — overview of Daniel using `about_me`, `skills` and `projects`
+- `tech_prompt(tech?)` — technical background, or a focused check on one technology
 
-![Screenshot 2025-05-09 at 15 40 09](https://github.com/user-attachments/assets/e8f4f3fe-cfec-420b-8999-dd9b08b204ec)
+## Run locally
 
+Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/).
 
-# Python Server instructions
-The Python server is a simple server that returns a greeting message.
-
-## Isntall UV
-To install UV, run the following command:
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-## Installation
-Go to the python_dani_mcp folder and run the following command:
 ```bash
 cd python_dani_mcp
+uv sync
+
+uv run python server.py            # stdio
+uv run python server.py --http     # Streamable HTTP on http://localhost:8000/mcp
+uv run pytest                      # tests (mocked upstream, no network)
+uv run ruff check .                # lint
 ```
 
-To install the Python server, run the following command:
-```bash
-uv run mcp install server.py
-```
+Test the UI views with the MCP Inspector: `npx @modelcontextprotocol/inspector` → Transport *Streamable HTTP* → `http://localhost:8000/mcp` → Apps tab.
 
-or Add this to your `.codegpt/mcp_config.json` for CodeGPT or `/path/to/Claude/claude_desktop_config.json` for Claude Desktop:
+## Client configuration
+
+### Claude Desktop (stdio)
+
 ```json
 {
   "mcpServers": {
-    "DaniMCP Python Server": {
-      "command": "/path/to/uv/.local/bin/uv",
-      "args": [
-        "run",
-        "--with",
-        "mcp[cli]",
-        "mcp",
-        "run",
-        "/path/to/projects/danimcp/python_dani_mcp/server.py"
-      ]
+    "DaniMCP": {
+      "command": "uv",
+      "args": ["run", "--directory", "/path/to/danimcp/python_dani_mcp", "python", "server.py"]
     }
   }
 }
 ```
 
-# TypeScript Server instructions
-(Comming soon)
+### Remote (Streamable HTTP)
+
+Add `https://<your-deployment>/mcp` as a custom connector in Claude, or for clients that only speak stdio:
+
+```json
+{
+  "mcpServers": {
+    "DaniMCP": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://<your-deployment>/mcp"]
+    }
+  }
+}
+```
+
+## Deploy to Vercel
+
+```bash
+cd python_dani_mcp
+vercel link --project danimcp --yes
+vercel deploy
+```
+
+The ASGI app (`server:app`) runs stateless Streamable HTTP at `/mcp`, with a health check at `/health`.

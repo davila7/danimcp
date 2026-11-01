@@ -1,0 +1,59 @@
+/* Shared styles for DaniMCP views. Host style variables (MCP Apps spec) win when provided. */
+:root {
+  color-scheme: light;
+  --bg: var(--color-background-primary, #fcfcfb);
+  --surface: var(--color-background-secondary, #f3f3f1);
+  --text: var(--color-text-primary, #0b0b0b);
+  --muted: var(--color-text-secondary, #52514e);
+  --subtle: var(--color-text-tertiary, #6b6a66);
+  --border: var(--color-border-primary, #e2e1dc);
+  --danger: var(--color-text-danger, #c62828);
+  --accent: #2a78d6;
+  --accent-soft: rgba(42, 120, 214, 0.12);
+  --radius: var(--border-radius-lg, 12px);
+  --radius-sm: var(--border-radius-sm, 6px);
+  --font: var(--font-sans, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --bg: var(--color-background-primary, #1a1a19);
+    --surface: var(--color-background-secondary, #242422);
+    --text: var(--color-text-primary, #f0efec);
+    --muted: var(--color-text-secondary, #c3c2b7);
+    --subtle: var(--color-text-tertiary, #9a998f);
+    --border: var(--color-border-primary, #3a3936);
+    --danger: var(--color-text-danger, #ef7373);
+    --accent: #3987e5;
+    --accent-soft: rgba(57, 135, 229, 0.18);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: var(--color-background-primary, #1a1a19);
+  --surface: var(--color-background-secondary, #242422);
+  --text: var(--color-text-primary, #f0efec);
+  --muted: var(--color-text-secondary, #c3c2b7);
+  --subtle: var(--color-text-tertiary, #9a998f);
+  --border: var(--color-border-primary, #3a3936);
+  --danger: var(--color-text-danger, #ef7373);
+  --accent: #3987e5;
+  --accent-soft: rgba(57, 135, 229, 0.18);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+/* No min-height: 100vh — the App auto-resizes the iframe to the content height. */
+body { font-family: var(--font); background: var(--bg); color: var(--text); padding: 16px; line-height: 1.45; }
+h1 { font-size: 1.15rem; font-weight: 600; }
+.subtitle { font-size: 0.85rem; color: var(--muted); margin: 2px 0 16px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.chip {
+  display: inline-block; font-size: 0.78rem; padding: 3px 9px; margin: 0 6px 6px 0;
+  border: 1px solid var(--border); border-radius: 999px; color: var(--text); background: var(--bg);
+}
+.label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--subtle); font-weight: 600; }
+a { color: var(--accent); text-decoration: none; font-weight: 500; }
+a:hover, a:focus-visible { text-decoration: underline; }
+#status { font-size: 0.85rem; color: var(--muted); padding: 24px 0; text-align: center; }
+#status.error { color: var(--danger); }
+[hidden] { display: none !important; }

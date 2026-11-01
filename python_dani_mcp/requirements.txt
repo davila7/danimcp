@@ -1,1 +1,3 @@
-fastmcp>=3.0.0b1
+# Used by Vercel's Python builder. Keep in sync with pyproject.toml.
+fastmcp>=4.1.4,<5
+httpx2>=2.5.0

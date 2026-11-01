@@ -1,9 +1,4 @@
-/typescript_dani_mcp/node_modules
-/typescript_dani_mcp/dist
-/typescript_dani_mcp/.env
-/typescript_dani_mcp/.DS_Store
-
-/python_dani_mcp/.env
-/python_dani_mcp/.DS_Store
+.DS_Store
+.env
+/python_dani_mcp/.venv/
 /python_dani_mcp/__pycache__/
-/python_dani_mcp/venv/
